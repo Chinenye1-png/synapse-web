@@ -161,9 +161,102 @@ export function ContractSwitcher() {
                 No contracts configured yet. Add one below.
               </div>
             ) : (
-              availableContracts.map((contract) => (
-                <ContractOption key={contract.id} contract={contract} selected={contract.id === contractId} onSelect={handleSelect} onRemove={(id, name) => { removeContract(id); toast(`Removed contract ${name}`, "info"); }} />
-              ))
+              availableContracts.map((c) => {
+                const isSelected = c.id === contractId;
+                return (
+                  <div
+                    key={c.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
+                    onClick={() => handleSelect(c.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handleSelect(c.id);
+                      }
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "7px 10px",
+                      background: isSelected ? "rgba(245,166,35,0.12)" : BG2,
+                      border: `1px solid ${isSelected ? AMBER : "transparent"}`,
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = BG3;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = BG2;
+                      }
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: isSelected ? 700 : 500,
+                            color: isSelected ? AMBER : "#eee",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {c.name}
+                        </span>
+                        {isSelected && (
+                          <span
+                            style={{
+                              fontSize: 8,
+                              padding: "1px 4px",
+                              background: "rgba(245,166,35,0.2)",
+                              color: AMBER,
+                              border: `1px solid ${AMBER}66`,
+                            }}
+                          >
+                            ACTIVE
+                          </span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 9, color: DIM, wordBreak: "break-all" }}>
+                        {shortId(c.id, 8)}
+                      </span>
+                    </div>
+
+                    {c.isCustom && (
+                      <button
+                        type="button"
+                        title="Remove contract"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeContract(c.id);
+                          toast(`Removed contract ${c.name}`, "info");
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: DIM,
+                          fontSize: 12,
+                          cursor: "pointer",
+                          padding: "2px 6px",
+                          marginLeft: 6,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = STATUS_META.FAILED.color)}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = DIM)}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
 
